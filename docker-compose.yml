@@ -1,0 +1,22 @@
+version: '2'
+services:
+  db:
+    image: mysql/mysql-server:5.7
+    volumes:
+      - ./dbdump/world-dev.sql:/docker-entrypoint-initdb.d/dump.sql
+    environment:
+      MYSQL_ROOT_PASSWORD: dummy
+      MYSQL_ROOT_HOST: "%"
+      MYSQL_DATABASE: world-dev
+    ports:
+      - "13306:3306"
+
+  cityapp:
+    build: ./build/.
+    image: cityapp:latest
+    env_file:
+      - ./devenv.list
+    ports:
+      - "3000:3000"
+    links:
+      - "db"

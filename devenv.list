@@ -1,0 +1,4 @@
+DBAddress=db
+DBName=world-dev
+DBUsername=root
+DBPassword=dummy
