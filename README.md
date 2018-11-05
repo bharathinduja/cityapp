@@ -31,12 +31,15 @@ Now we will deploy the application in OpenShift (as production) and will fetch c
 The same container image `cityapp:latests` will be deployed in OpenShift with Conjur Authenticator Sidecar. Application fetch database username/password from Conjur using access token which is made available transparently by Conjur authenticator sidecar.
 
 1. Modify `conjur-cityapp-policy.yml` with appropriate clustername and secret variable and load it to your Conjur Master   
-2. Modify `bootstrap.env` per your environment and run `source bootstrap.env` to load parameters  
-3. Modify openshift deployment yaml file in `openshift/city-restapi-sidecar` per your environment  
-       - host under route definition - hostname to access test application on openshift
+2. Initialize CA of k8s authenticator service 
+```docker exec conjur-master chpst -u conjur conjur-plugin-service possum rake authn_k8s:ca_init["conjur/authn-k8s/sg-cluster"]```
+Replace sg-cluster with your cluster id
+3. Modify `bootstrap.env` per your environment and run `source bootstrap.env` to load parameters  
+4. Modify openshift deployment yaml file in `openshift/city-restapi-sidecar` per your environment  
+       - host under route definition - hostname to access test application on openshift  
        - DBAddress - hostname or address of production database  
        - DBName - database name of production database e.g. world  
        - DBUsername_CONJUR_VAR - Conjur variable reference to production database username  
        - DBPassword_CONJUR_VAR - Conjur variable reference to production database password  
-4. Follow the deployment script from step 0 - 4
-5. The test web application should now be availble via url defined in previous step
+5. Follow the deployment script from step 0 - 4
+6. The test web application should now be availble via url defined in previous step

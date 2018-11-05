@@ -3,9 +3,6 @@ set -eo pipefail
 
 . utils.sh
 
-#test_app_image="petapp:0.2" # read from bootstrap instead
-#app_name="petapp-summon-sidecar" # read from bootstrap instead
-
 main() {
   announce "Deploying test apps for $TEST_APP_NAMESPACE_NAME."
 

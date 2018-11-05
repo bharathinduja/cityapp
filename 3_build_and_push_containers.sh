@@ -5,7 +5,7 @@ set -euo pipefail
 
 docker login -u _ -p $(oc whoami -t) $DOCKER_REGISTRY_PATH
 
-announce "Building and pushing petapp images."
+announce "Building and pushing cityapp images."
 
   pushd build
     ./build.sh

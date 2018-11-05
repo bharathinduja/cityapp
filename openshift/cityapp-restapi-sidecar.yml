@@ -60,9 +60,9 @@ spec:
           - name: DBName
             value: "world"
           - name: DBPassword_CONJUR_VAR
-            value: "cyberark:variable:Vault/DBDemo/MySQL-APP/cityapp/password"
+            value: "cyberark:variable:Vault/Demo/DB-App/cityapp/password"
           - name: DBUsername_CONJUR_VAR
-            value: "cyberark:variable:Vault/DBDemo/MySQL-APP/cityapp/username"
+            value: "cyberark:variable:Vault/Demo/DB-App/cityapp/username"
           - name: CONJUR_APPLIANCE_URL
             value: "{{ CONJUR_APPLIANCE_URL }}"
           - name: CONJUR_ACCOUNT

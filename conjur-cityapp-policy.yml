@@ -74,8 +74,8 @@
   id: Vault/Demo
   body:
   - &variables
-    - !variable MySQL-APP/cityapp/username
-    - !variable MySQL-APP/cityapp/password
+    - !variable DB-App/cityapp/username
+    - !variable DB-App/cityapp/password
   - !permit
     role: !layer /openshift-apps/cityapp
     privileges: [ read, execute ]
