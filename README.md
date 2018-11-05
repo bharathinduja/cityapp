@@ -3,7 +3,6 @@ A simple Ruby  application to demonstrate how to leverage Conjur to secure datab
 
 This app respond to web request with a random city name and population info from MySQL database. 
 
-
 ## Prerequisite
 1. A Conjur V5 Cluster with Followers in OpenShift - 
 refer to https://github.com/jeepapichet/ to deploy follower for openshift authenticator
