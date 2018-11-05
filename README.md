@@ -5,7 +5,8 @@ This app respond to web request with a random city name and population info from
 
 
 ## Prerequisite
-1. A Conjur V5 Cluster with Followers in OpenShift - refer to https://github.com/jeepapichet/ to deploy follower for openshift authenticator
+1. A Conjur V5 Cluster with Followers in OpenShift - 
+refer to https://github.com/jeepapichet/ to deploy follower for openshift authenticator
 2. MySQL Database installed with sample world database
 refer to https://dev.mysql.com/doc/world-setup/en/
 3. MySQL account for application is available as secrets in Conjur.
