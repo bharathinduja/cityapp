@@ -1,7 +1,7 @@
 version: '2'
 services:
   db:
-    image: mysql/mysql-server:5.7
+    image: mysql/mysql-server:5.7.24
     volumes:
       - ./dbdump/world-dev.sql:/docker-entrypoint-initdb.d/dump.sql
     environment:
@@ -19,4 +19,6 @@ services:
     ports:
       - "3000:3000"
     links:
+      - "db"
+    depends_on:
       - "db"

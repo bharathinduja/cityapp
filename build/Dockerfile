@@ -1,4 +1,4 @@
-FROM ruby:2.2.9 as app-builder
+FROM ruby:2.3.8 as app-builder
 MAINTAINER CyberArk
 LABEL builder="app-builder"
 
@@ -17,7 +17,7 @@ ENV PATH="/usr/local/lib/summon:${PATH}"
 
 # ============= MAIN CONTAINER ============== #
 
-FROM ruby:2.3
+FROM ruby:2.3.8
 RUN apt-get update -y
 RUN apt-get install -y apt-file
 RUN apt-file update 
