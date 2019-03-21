@@ -1,1 +1,8 @@
 mybootstrap.env
+*.netrc
+*.conjurrc
+*.pem
+*archived*
+*.cache*
+*generated*
+*backup*

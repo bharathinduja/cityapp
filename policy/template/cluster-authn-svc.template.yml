@@ -1,0 +1,27 @@
+# Sample openshift authenticator policy policy
+- !policy
+  id: conjur/authn-k8s/{{ AUTHENTICATOR_ID }}
+  owner: !group devops
+
+  body:
+  - !webservice
+    annotations:
+      description: Authentication service for the {{ AUTHENTICATOR_ID }} cluster.
+
+  - !policy
+    id: ca                 # ca policy - do not change
+    body:
+    - !variable
+      id: cert
+      annotations:
+        description: CA cert for Kubernetes Pods.
+
+    - !variable
+      id: key
+      annotations:
+        description: CA key for Kubernetes Pods.
+
+  - !permit
+   resource: !webservice
+   privilege: [ read, authenticate ]
+   role: !layer /conjur/authn-k8s/{{ AUTHENTICATOR_ID }}/apps

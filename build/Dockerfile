@@ -1,10 +1,12 @@
-FROM ruby:2.3.8 as app-builder
+FROM alpine:3.2 as app-builder
 MAINTAINER CyberArk
 LABEL builder="app-builder"
 
 #---some useful tools for interactive usage---#
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends curl
+RUN apk update && \
+    apk upgrade && \
+    apk add bash curl && \
+    rm -rf /var/cache/apk/*
 
 #---install summon and summon-conjur---#
 RUN curl -sSL https://raw.githubusercontent.com/cyberark/summon/master/install.sh \
@@ -17,11 +19,31 @@ ENV PATH="/usr/local/lib/summon:${PATH}"
 
 # ============= MAIN CONTAINER ============== #
 
-FROM ruby:2.3.8
-RUN apt-get update -y
-RUN apt-get install -y apt-file
-RUN apt-file update 
-RUN apt-get install -y vim 
+FROM alpine:3.2
+MAINTAINER CyberArk
+
+ENV BUILD_PACKAGES bash curl-dev ruby-dev build-base vim
+ENV DB_PACKAGES mariadb-dev
+ENV RUBY_PACKAGES ruby ruby-io-console ruby-bundler
+
+# Update and install all of the required packages.
+# At the end, remove the apk cache
+RUN apk update && \
+    apk upgrade && \
+    apk add $BUILD_PACKAGES && \
+    apk add $DB_PACKAGES && \
+    apk add $RUBY_PACKAGES && \
+    rm -rf /var/cache/apk/*
+
+WORKDIR /usr/src
+
+#RUN mkdir /usr/app
+#WORKDIR /usr/app
+#COPY Gemfile /usr/app/
+#COPY Gemfile.lock /usr/app/
+#RUN bundle install
+#COPY . /usr/app
+
 
 RUN gem install -N activesupport --version 4.2.7.1
 RUN gem install -N conjur-api conjur-cli sinatra
@@ -31,7 +53,6 @@ RUN gem install mysql2 --platform=ruby
 COPY --from=app-builder /usr/local/lib/summon /usr/local/lib/summon
 COPY --from=app-builder /usr/local/bin/summon /usr/local/bin/summon
 
-WORKDIR /usr/src
 
 COPY cityapp.rb cityapp_summon.rb secrets.yml printvars.sh /usr/src/
 
@@ -41,4 +62,3 @@ EXPOSE 3000
 
 CMD [ "ruby", "/usr/src/cityapp.rb", "-o", "0.0.0.0" ]
 #CMD [ "sleep", "infinity" ]
-

@@ -10,13 +10,11 @@ main() {
   init_registry_creds
   init_connection_specs
 
-  if is_minienv; then
-    IMAGE_PULL_POLICY='Never'
-  else
-    IMAGE_PULL_POLICY='Always'
-  fi
+  IMAGE_PULL_POLICY='Always'
 
-  deploy_app
+  deploy_app cityapp-restapi-sidecar
+  deploy_app cityapp-summon-init
+  deploy_app cityapp-secretless
 }
 
 ###########################
@@ -57,30 +55,43 @@ init_connection_specs() {
   conjur_authn_login_prefix=host/conjur/authn-k8s/$AUTHENTICATOR_ID/apps/$TEST_APP_NAMESPACE_NAME
 
   authenticator_image_registry_name=$(platform_image conjur-kubernetes-authenticator:latest)
+  secretless_image_registry_name=$(platform_image secretless-broker:latest)
 
 }
 
 ###########################
 deploy_app() {
+  if [[ $# != 1 ]]; then
+    printf "Error in %s/%s - expecting 1 arg.\n" $(pwd) $0
+    exit -1
+  fi
+  APP_NAME=$1
+
   $cli delete service $TEST_APP_NAMESPACE_NAME --ignore-not-found
   $cli delete route $TEST_APP_NAMESPACE_NAME --ignore-not-found
+  $cli delete service $APP_NAME --ignore-not-found
+  $cli delete route $APP_NAME --ignore-not-found
   $cli delete --ignore-not-found \
     deployment/$APP_NAME \
     serviceaccount/$APP_NAME
+  $cli delete configmap $APP_NAME-config --ignore-not-found
 
-#  echo "regname=$test_app_image_registry_name"
-#  echo "url=$conjur_appliance_url"
-#  echo "auth_url=$conjur_authenticator_url"
-#  echo "prefix=$conjur_authn_login_prefix"
-
-  if [ $PLATFORM = 'openshift' ]; then
-    oc delete --ignore-not-found deploymentconfig/$APP_NAME
-  fi
-
+  oc delete --ignore-not-found deploymentconfig/$APP_NAME
+  echo "Wait 5 second for deletion to complete"
   sleep 5
 
-  sed -e "s#{{ TEST_APP_DOCKER_IMAGE }}#$test_app_image_registry_name#g" ./openshift/$APP_NAME.yml |
+#Create configmap for secretless broker if APP_NAME contain secretless
+  if [[ $APP_NAME == *"secretless"* ]]; then
+    $cli create configmap $APP_NAME-config \
+      --from-file=etc/secretless.yml
+  fi
+
+
+  mkdir -p /openshift/generated
+
+  sed -e "s#{{ TEST_APP_DOCKER_IMAGE }}#$test_app_image_registry_name#g" ./openshift/template/$APP_NAME.yml.template |
     sed -e "s#{{ AUTHENTICATOR_DOCKER_IMAGE }}#$authenticator_image_registry_name#g" |
+    sed -e "s#{{ SECRETLESS_DOCKER_IMAGE }}#$secretless_image_registry_name#g" |
     sed -e "s#{{ IMAGE_PULL_POLICY }}#$IMAGE_PULL_POLICY#g" |
     sed -e "s#{{ CONJUR_VERSION }}#$CONJUR_VERSION#g" |
     sed -e "s#{{ CONJUR_ACCOUNT }}#$CONJUR_ACCOUNT#g" |
@@ -90,10 +101,13 @@ deploy_app() {
     sed -e "s#{{ TEST_APP_NAMESPACE_NAME }}#$TEST_APP_NAMESPACE_NAME#g" |
     sed -e "s#{{ AUTHENTICATOR_ID }}#$AUTHENTICATOR_ID#g" |
     sed -e "s#{{ CONFIG_MAP_NAME }}#$TEST_APP_NAMESPACE_NAME#g" |
-    sed -e "s#{{ CONJUR_VERSION }}#'$CONJUR_VERSION'#g" |
-    $cli create -f -
+    sed -e "s#{{ OSHIFT_CLUSTER_URL }}#$OSHIFT_CLUSTER_URL#g" |
+    sed -e "s#{{ CONJUR_VERSION }}#'$CONJUR_VERSION'#g" > ./openshift/generated/$APP_NAME.yml
 
-  echo "Test app/sidecar deployed."
+
+  $cli create -f ./openshift/generated/$APP_NAME.yml
+
+  echo "Test app $APP_NAME deployed."
 }
 
 main $@

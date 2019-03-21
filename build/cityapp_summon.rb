@@ -15,6 +15,10 @@ enable :logging
 
 helpers do
 
+  def dbport
+    ENV['DBPort'] or "3306"
+  end
+
   def dbaddress
     ENV['DBAddress'] or raise "Error no password or password conjur variable defined"
   end
@@ -41,7 +45,7 @@ get '/' do
     randomcity = mysqlclient.query('SELECT city.Name as City,country.name as Country,city.District,city.Population FROM city,country WHERE city.CountryCode = country.Code ORDER BY RAND() LIMIT 1').to_a[0]
     mysqlclient.close
 
-    "<title> Random World Cities! </title>\n<br><br>\n<p style=\"font-size:30px\"><b>#{randomcity['City']}</b> is a city in #{randomcity['District']}, #{randomcity['Country']} with a population of #{randomcity['Population']}\n<br><br><br><p>\n<small>Connected to database #{dbname} on #{dbaddress} using username: #{dbusername} and password: #{dbpassword}</small>\n"
+    "<title> Random World Cities! </title>\n<br><br>\n<p style=\"font-size:30px\"><b>#{randomcity['City']}</b> is a city in #{randomcity['District']}, #{randomcity['Country']} with a population of #{randomcity['Population']}\n<br><br><br><p>\n<small>Connected to database #{dbname} on #{dbaddress}:#{dbport} using username: #{dbusername} and password: #{dbpassword}</small>\n"
 
   rescue
     $stderr.puts $!

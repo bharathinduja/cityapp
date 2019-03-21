@@ -9,4 +9,3 @@ set -xeuo pipefail
 ./2_store_conjur_cert.sh
 ./3_build_and_push_containers.sh
 ./4_deploy_test_app.sh
-#./7_verify_authentication.sh

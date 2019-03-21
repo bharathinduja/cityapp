@@ -32,7 +32,7 @@ helpers do
     Conjur::API.new_from_token(token)
   end
 
-#  Mysqlclient = Mysql2::Client.new(host: 'mysqldb01.dbdemo.local',
+#  Mysqlclient = Mysql2::Client.new(host: 'mysqldb01.cyberark.local',
 #                                 username: 'cityappA',
 #                                 password: 'e]4zoYAW6F,4avx',
 #                                 database: 'world')
@@ -53,7 +53,7 @@ get '/' do
 #    sqlusername = ENV['MySQLUserName']
 #    mydata = get_city
 
-    Mysqlclient = Mysql2::Client.new(host: 'mysqldb01.dbdemo.local',
+    Mysqlclient = Mysql2::Client.new(host: 'mysqldb01.cyberark.local',
                                  username: sqlusername,
                                  password: sqlpassword,
                                  database: 'world')

@@ -20,3 +20,9 @@ announce "Pusing conjur-kubernetes-authenticator image"
 authenticator_image_registry_name=$(platform_image conjur-kubernetes-authenticator:latest)
 docker tag $AUTHENTICATOR_IMAGE $authenticator_image_registry_name
 docker push $authenticator_image_registry_name
+
+announce "Pusing secretless-broker image"
+
+secretless_image_registry_name=$(platform_image secretless-broker:latest)
+docker tag $SECRETLESS_IMAGE $secretless_image_registry_name
+docker push $secretless_image_registry_name

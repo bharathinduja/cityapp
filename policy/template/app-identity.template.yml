@@ -1,0 +1,14 @@
+# Define secrets the app has access to
+- !policy
+  id: openshift-apps/{{ TEST_APP_NAMESPACE_NAME }}
+  owner: !group devops
+  body:
+  - !layer
+
+  - !grant
+    role: !layer
+    members:
+    - !host /conjur/authn-k8s/{{ AUTHENTICATOR_ID }}/apps/cityapp/*/*
+    - !host /conjur/authn-k8s/{{ AUTHENTICATOR_ID }}/apps/cityapp/service_account/cityapp-restapi-sidecar
+    - !host /conjur/authn-k8s/{{ AUTHENTICATOR_ID }}/apps/cityapp/service_account/cityapp-summon-init
+    - !host /conjur/authn-k8s/{{ AUTHENTICATOR_ID }}/apps/cityapp/service_account/cityapp-secretless
