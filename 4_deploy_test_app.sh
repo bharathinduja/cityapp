@@ -76,18 +76,46 @@ deploy_app() {
     serviceaccount/$APP_NAME
   $cli delete configmap $APP_NAME-config --ignore-not-found
 
-  oc delete --ignore-not-found deploymentconfig/$APP_NAME
+  $cli delete --ignore-not-found deploymentconfig/$APP_NAME
   echo "Wait 5 second for deletion to complete"
   sleep 5
 
 #Create configmap for secretless broker if APP_NAME contain secretless
+
   if [[ $APP_NAME == *"secretless"* ]]; then
+
+    mkdir -p ./etc/generated
+
+    sed -e "s#{{ DB_ADDRESS }}#$DB_ADDRESS#g" ./etc/template/secretless.yml |
+      sed -e "s#{{ DB_ADDRESS }}#$DB_ADDRESS#g" |
+      sed -e "s#{{ DB_PORT }}#$DB_PORT#g" |
+      sed -e "s#{{ DB_NAME }}#$DB_NAME#g" |
+      sed -e "s#{{ DB_USERNAME_CONJUR_VAR }}#$DB_USERNAME_CONJUR_VAR#g" |
+      sed -e "s#{{ DB_PASSWORD_CONJUR_VAR }}#$DB_PASSWORD_CONJUR_VAR#g" > ./etc/generated/secretless.yml
+
     $cli create configmap $APP_NAME-config \
-      --from-file=etc/secretless.yml
+      --from-file=etc/generated/secretless.yml
+  fi
+
+#Create configmap for summon if APP_NAME contain summon
+
+  if [[ $APP_NAME == *"summon"* ]]; then
+
+    mkdir -p ./etc/generated
+
+    sed -e "s#{{ DB_ADDRESS }}#$DB_ADDRESS#g" ./etc/template/secrets.yml |
+      sed -e "s#{{ DB_ADDRESS }}#$DB_ADDRESS#g" |
+      sed -e "s#{{ DB_PORT }}#$DB_PORT#g" |
+      sed -e "s#{{ DB_NAME }}#$DB_NAME#g" |
+      sed -e "s#{{ DB_USERNAME_CONJUR_VAR }}#$DB_USERNAME_CONJUR_VAR#g" |
+      sed -e "s#{{ DB_PASSWORD_CONJUR_VAR }}#$DB_PASSWORD_CONJUR_VAR#g" > ./etc/generated/secrets.yml
+
+    $cli create configmap $APP_NAME-config \
+      --from-file=etc/generated/secrets.yml
   fi
 
 
-  mkdir -p /openshift/generated
+  mkdir -p ./openshift/generated
 
   sed -e "s#{{ TEST_APP_DOCKER_IMAGE }}#$test_app_image_registry_name#g" ./openshift/template/$APP_NAME.yml.template |
     sed -e "s#{{ AUTHENTICATOR_DOCKER_IMAGE }}#$authenticator_image_registry_name#g" |
@@ -102,6 +130,11 @@ deploy_app() {
     sed -e "s#{{ AUTHENTICATOR_ID }}#$AUTHENTICATOR_ID#g" |
     sed -e "s#{{ CONFIG_MAP_NAME }}#$TEST_APP_NAMESPACE_NAME#g" |
     sed -e "s#{{ OSHIFT_CLUSTER_URL }}#$OSHIFT_CLUSTER_URL#g" |
+    sed -e "s#{{ DB_ADDRESS }}#$DB_ADDRESS#g" |
+    sed -e "s#{{ DB_PORT }}#$DB_PORT#g" |
+    sed -e "s#{{ DB_NAME }}#$DB_NAME#g" |
+    sed -e "s#{{ DB_USERNAME_CONJUR_VAR }}#$DB_USERNAME_CONJUR_VAR#g" |
+    sed -e "s#{{ DB_PASSWORD_CONJUR_VAR }}#$DB_PASSWORD_CONJUR_VAR#g" |
     sed -e "s#{{ CONJUR_VERSION }}#'$CONJUR_VERSION'#g" > ./openshift/generated/$APP_NAME.yml
 
 

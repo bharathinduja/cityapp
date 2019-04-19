@@ -7,7 +7,7 @@ announce "Storing Conjur cert for test app configuration."
 
 set_namespace $CONJUR_NAMESPACE_NAME
 
-echo "Retrieving Conjur certificate."
+echo "Retrieving Conjur certificate from master container"
 
 follower_pod_name=$($cli get pods -l role=follower --no-headers | awk '{ print $1 }' | head -1)
 ssl_cert=$($cli exec $follower_pod_name -- cat /opt/conjur/etc/ssl/conjur.pem)

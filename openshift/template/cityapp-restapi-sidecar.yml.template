@@ -28,6 +28,9 @@ spec:
   host: "cityapp-restapi-sidecar.{{ OSHIFT_CLUSTER_URL }}"
   port:
     targetPort: http
+#  tls:
+#    insecureEdgeTerminationPolicy: Allow
+#    termination: edge
   to:
     kind: Service
     name: cityapp-restapi-sidecar
@@ -55,15 +58,15 @@ spec:
         name: cityapp
         env:
           - name: DBAddress
-            value: "mysqldb01.cyberark.local"
+            value: "{{ DB_ADDRESS }}"
           - name: DBPort
-            value: "3306"
+            value: "{{ DB_PORT }}"
           - name: DBName
-            value: "world"
+            value: "{{ DB_NAME }}"
           - name: DBPassword_CONJUR_VAR
-            value: "cyberark:variable:Vault/Demo/DB-App/cityapp/password"
+            value: "{{ DB_PASSWORD_CONJUR_VAR }}"
           - name: DBUsername_CONJUR_VAR
-            value: "cyberark:variable:Vault/Demo/DB-App/cityapp/username"
+            value: "{{ DB_USERNAME_CONJUR_VAR }}"
           - name: CONJUR_APPLIANCE_URL
             value: "{{ CONJUR_APPLIANCE_URL }}"
           - name: CONJUR_ACCOUNT
@@ -110,8 +113,8 @@ spec:
           - name: CONJUR_ACCOUNT
             value: {{ CONJUR_ACCOUNT }}
           - name: CONJUR_AUTHN_LOGIN
-#            value: "{{ CONJUR_AUTHN_LOGIN_PREFIX }}/*/*"
             value: "{{ CONJUR_AUTHN_LOGIN_PREFIX }}/service_account/cityapp-restapi-sidecar"
+#            value: "{{ CONJUR_AUTHN_LOGIN_PREFIX }}/*/*"
           - name: CONJUR_SSL_CERTIFICATE
             valueFrom:
               configMapKeyRef:

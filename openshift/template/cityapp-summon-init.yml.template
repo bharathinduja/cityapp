@@ -24,11 +24,13 @@ metadata:
   labels:
     app: cityapp-summon-init
   name: cityapp-summon-init
-#  namespace: cityapp-summon
 spec:
   host: "cityapp-summon-init.{{ OSHIFT_CLUSTER_URL }}"
   port:
     targetPort: http
+#  tls:
+#    insecureEdgeTerminationPolicy: Allow
+#    termination: edge
   to:
     kind: Service
     name: cityapp-summon-init
@@ -56,11 +58,11 @@ spec:
         name: cityapp
         env:
           - name: DBAddress
-            value: "mysqldb01.cyberark.local"
+            value: "{{ DB_ADDRESS }}"
           - name: DBName
-            value: "world"
+            value: "{{ DB_NAME }}"
           - name: DBPort
-            value: "3306"
+            value: "{{ DB_PORT }}"
           - name: CONJUR_APPLIANCE_URL
             value: "{{ CONJUR_APPLIANCE_URL }}"
           - name: CONJUR_ACCOUNT
@@ -81,11 +83,12 @@ spec:
           - mountPath: /run/conjur
             name: conjur-access-token
             readOnly: true
-        command: [ "summon", "-e", "production", "ruby", "/usr/src/cityapp.rb", "-o", "0.0.0.0" ]
+          - mountPath: /etc/summon
+            name: summon-config
+            readOnly: true
+        command: [ "summon", "-f", "/etc/summon/secrets.yml", "ruby", "/usr/src/cityapp.rb", "-o", "0.0.0.0" ]
 #Add initContainers to run authenticator as init when pod start
       initContainers:
-# change to authenticator on oc registr
-#      - image: cyberark/conjur-kubernetes-authenticator
       - image: {{ AUTHENTICATOR_DOCKER_IMAGE }}
         imagePullPolicy: Always
         name: authenticator
@@ -113,8 +116,8 @@ spec:
           - name: CONJUR_ACCOUNT
             value: {{ CONJUR_ACCOUNT }}
           - name: CONJUR_AUTHN_LOGIN
-            value: "{{ CONJUR_AUTHN_LOGIN_PREFIX }}/*/*"
-#            value: "{{ CONJUR_AUTHN_LOGIN_PREFIX }}/service_account/cityapp"
+            value: "{{ CONJUR_AUTHN_LOGIN_PREFIX }}/service_account/cityapp-summon-init"
+#            value: "{{ CONJUR_AUTHN_LOGIN_PREFIX }}/*/*"
           - name: CONJUR_SSL_CERTIFICATE
             valueFrom:
               configMapKeyRef:
@@ -129,3 +132,6 @@ spec:
         - name: conjur-access-token
           emptyDir:
             medium: Memory
+        - name: summon-config
+          configMap:
+            name: cityapp-summon-init-config
