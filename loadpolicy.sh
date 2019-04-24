@@ -29,7 +29,7 @@ announce "Loading Conjur policy."
 
 # Create the random database password
 
-sudo docker run --rm -v $PWD/policy:/root -it cyberark/conjur-cli:5 init -u https://$CONJUR_MASTER_DNS_NAME -a cyberark --force=yes
+sudo docker run --rm -v $PWD/policy:/root -it cyberark/conjur-cli:5 init -u https://$CONJUR_MASTER_DNS_NAME -a $CONJUR_ACCOUNT --force=yes
 sudo docker run --rm -v $PWD/policy:/root -it cyberark/conjur-cli:5 authn login -u admin -p $CONJUR_ADMIN_PASSWORD
 sudo docker run --rm -v $PWD/policy:/root -it cyberark/conjur-cli:5 policy load root /root/generated/projects-authn.yml
 sudo docker run --rm -v $PWD/policy:/root -it cyberark/conjur-cli:5 policy load root /root/generated/cluster-authn-svc.yml

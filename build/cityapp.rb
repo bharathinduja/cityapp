@@ -29,11 +29,11 @@ helpers do
   end
 
   def dbusername
-    ENV['DBUsername'] or conjur_api.resource("cyberark:variable:" + ENV['DBUsername_CONJUR_VAR']).value or raise "Error no password or password conjur variable defined"
+    ENV['DBUsername'] or conjur_api.resource(ENV['CONJUR_ACCOUNT'] + ":variable:" + ENV['DBUsername_CONJUR_VAR']).value or raise "Error no password or password conjur variable defined"
   end
 
   def dbpassword
-    ENV['DBPassword'] or conjur_api.resource("cyberark:variable:" + ENV['DBPassword_CONJUR_VAR']).value or raise "Error no password or password conjur variable defined"
+    ENV['DBPassword'] or conjur_api.resource(ENV['CONJUR_ACCOUNT'] + ":variable:" + ENV['DBPassword_CONJUR_VAR']).value or raise "Error no password or password conjur variable defined"
   end
 
   def conjur_api
