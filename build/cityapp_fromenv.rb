@@ -1,7 +1,6 @@
 #!/usr/bin/env ruby
 
 require 'sinatra'
-require 'conjur-api'
 require 'cgi'
 require 'json'
 require 'mysql2'
@@ -16,42 +15,30 @@ enable :logging
 
 helpers do
 
-  def dbaddress
-    ENV['DBAddress'] or raise "Error: no Database Address defined"
-  end
-
   def dbport
     ENV['DBPort'] or "3306"
   end
 
-  def dbname
-    ENV['DBName'] or raise "Error: No Database Name defined"
+  def dbaddress
+    ENV['DBAddress'] or raise "Error: no Database Address defined"
   end
 
-  # ---- Modify code to perform password lookup from Conjur using Conjur Ruby API
+  def dbname
+    ENV['DBName'] or raise "Error: no Database Name defined"
+  end
+
   def dbusername
-    ENV['DBUsername'] or conjur_api.resource(ENV['CONJUR_ACCOUNT'] + ":variable:" + ENV['DBUsername_CONJUR_VAR']).value or raise "Error: no Username or Conjur variable for Username defined"
+    ENV['DBUsername'] or raise "Error: no Username defined"
   end
 
   def dbpassword
-    ENV['DBPassword'] or conjur_api.resource(ENV['CONJUR_ACCOUNT'] + ":variable:" + ENV['DBPassword_CONJUR_VAR']).value or raise "Error: no Password or Conjur variable for Password defined"
+    ENV['DBPassword'] or raise "Error: no Password defined"
   end
-
-  def conjur_api
-    # Ideally this would be done only once.
-    # But for testing, it means that if the login fails, the pod is stuck in a bad state
-    # and the tests can't be performed.
-    Conjur.configuration.apply_cert_config!
-    token = JSON.parse(File.read("/run/conjur/access-token"))
-    Conjur::API.new_from_token(token)
-  end
-
 end
 
 get '/' do
   begin
     mysqlclient = Mysql2::Client.new(host: dbaddress,
-                                 port: dbport,
                                  username: dbusername,
                                  password: dbpassword,
                                  database: dbname)

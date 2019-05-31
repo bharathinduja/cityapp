@@ -54,7 +54,7 @@ COPY --from=app-builder /usr/local/lib/summon /usr/local/lib/summon
 COPY --from=app-builder /usr/local/bin/summon /usr/local/bin/summon
 
 
-COPY cityapp.rb cityapp_summon.rb secrets.yml printvars.sh /usr/src/
+COPY cityapp.rb cityapp_fromenv.rb secrets.yml printvars.sh /usr/src/
 
 
 ENV PORT 3000

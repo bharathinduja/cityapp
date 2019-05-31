@@ -12,6 +12,7 @@ main() {
 
   IMAGE_PULL_POLICY='Always'
 
+  deploy_app cityapp-hardcode
   deploy_app cityapp-restapi-sidecar
   deploy_app cityapp-summon-init
   deploy_app cityapp-secretless
@@ -133,6 +134,8 @@ deploy_app() {
     sed -e "s#{{ DB_ADDRESS }}#$DB_ADDRESS#g" |
     sed -e "s#{{ DB_PORT }}#$DB_PORT#g" |
     sed -e "s#{{ DB_NAME }}#$DB_NAME#g" |
+    sed -e "s#{{ DB_USERNAME }}#$DB_USERNAME#g" |
+    sed -e "s#{{ DB_PASSWORD }}#$DB_PASSWORD#g" |
     sed -e "s#{{ DB_USERNAME_CONJUR_VAR }}#$DB_USERNAME_CONJUR_VAR#g" |
     sed -e "s#{{ DB_PASSWORD_CONJUR_VAR }}#$DB_PASSWORD_CONJUR_VAR#g" |
     sed -e "s#{{ CONJUR_VERSION }}#'$CONJUR_VERSION'#g" > ./openshift/generated/$APP_NAME.yml
