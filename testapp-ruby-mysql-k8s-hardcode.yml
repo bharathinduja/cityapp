@@ -40,7 +40,7 @@ spec:
     spec:
       serviceAccountName: testapp-hardcode
       containers:
-      - image: quincycheng/testapp:latest
+      - image: bhinduja/cityapp:1.0
         imagePullPolicy: Always
         name: testapp
         env:
